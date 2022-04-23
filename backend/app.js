@@ -4,14 +4,15 @@ const cors = require("cors");
 const http = require("http");
 const server = http.createServer(app);
 const socketIo = require("socket.io");
+const index = require("./routes/index");
 
 const port = process.env.PORT || 4001;
-const index = require("./routes/index");
 
 app.use(cors());
 app.use(index);
+app.use("/api/gameTable", require("./routes/gameTable.routes"));
 
-const io = socketIo(server, { cors: { origin: "*" }});
+const io = socketIo(server, { cors: { origin: "*" } });
 
 let interval;
 
