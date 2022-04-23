@@ -8,6 +8,17 @@ export const createGameTable = async () => {
       return [response.data, null];
     })
     .catch((error) => {
-      return [null, Promise.reject(error)];
+      return [null, error.response];
+    });
+};
+
+export const updateGameTable = async (gameId, body) => {
+  return await axios
+    .patch(`${API_URL}/api/gameTable/updateGame/${gameId}`, body)
+    .then((response) => {
+      return [response.data, null];
+    })
+    .catch((error) => {
+      return [null, error.response];
     });
 };

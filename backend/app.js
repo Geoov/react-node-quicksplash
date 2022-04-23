@@ -5,12 +5,13 @@ const http = require("http");
 const server = http.createServer(app);
 const socketIo = require("socket.io");
 const index = require("./routes/index");
-
 const port = process.env.PORT || 4001;
 
+app.use(express.json());
 app.use(cors());
 app.use(index);
 app.use("/api/gameTable", require("./routes/gameTable.routes"));
+app.use("/api/user", require("./routes/user.routes"));
 
 const io = socketIo(server, { cors: { origin: "*" } });
 

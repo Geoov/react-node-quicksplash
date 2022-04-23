@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import "./FindGame.scss";
 import { Button } from "react-bootstrap";
-import { createGameTable } from "../../api/GameTableAPI";
-import { API_URL } from "../../config/config";
-import axios from "axios";
+import { createGameTable, updateGameTable } from "../../api/GameTableAPI";
+import { createUser } from "../../api/UserAPI";
 
 function FindGame() {
   const [nickName, setNickName] = useState("");
@@ -20,19 +19,34 @@ function FindGame() {
   };
 
   async function joinGame() {
-    console.log("1");
+    if (!nickName || !gameCode) return;
   }
 
   async function createGame() {
-    let [data, error] = await createGameTable();
+    if (!nickName) return;
 
-    if (error) handleError(error);
+    let [createdGame, errorCreatedGame] = await createGameTable();
+    if (errorCreatedGame) handleError(errorCreatedGame);
 
-    
+    let [createdUser, errorCreatedUser] = await createUser(
+      createdGame.id,
+      nickName
+    );
+    if (errorCreatedUser) handleError(errorCreatedUser);
+
+    let body = {
+      id_host_user: createdUser.id,
+      users_number: 1,
+    };
+    let [updatedGame, errorUpdatedGame] = await updateGameTable(
+      createdGame.id,
+      body
+    );
+    if (errorUpdatedGame) handleError(errorUpdatedGame);
   }
 
   function handleError(error) {
-    alert(error);
+    alert(error.status + "-" + error.statusText);
     return;
   }
 
