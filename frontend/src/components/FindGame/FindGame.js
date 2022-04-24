@@ -3,7 +3,7 @@ import { SocketContext } from "../../context/socket";
 import "./FindGame.scss";
 import { Button } from "react-bootstrap";
 
-function FindGame() {
+function FindGame({ onJoinedGame }) {
   const socket = useContext(SocketContext);
   const [nickName, setNickName] = useState("");
   const [gameCode, setGameCode] = useState("");
@@ -19,13 +19,29 @@ function FindGame() {
   };
 
   useEffect(() => {
-    socket.on("gameCreated", (data) => {
-      console.log(data);
+    socket.on("createdGame", (data) => {
+      console.log("createdGame", data);
+      onJoinedGame(true);
+    });
+  }, []);
+
+  useEffect(() => {
+    socket.on("joinedGame", (data) => {
+      console.log("joinedGame", data);
+      onJoinedGame(true);
+    });
+  }, []);
+
+  useEffect(() => {
+    socket.on("universalError", (data) => {
+      alert(data.message);
     });
   }, []);
 
   async function joinGame() {
     if (!nickName || !gameCode) return;
+
+    socket.emit("joinGame", { nickName, gameCode });
   }
 
   async function createGame() {

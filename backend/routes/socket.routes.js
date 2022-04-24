@@ -1,6 +1,6 @@
 const { v4: uuidv4 } = require("uuid");
 
-function socketRoutes(app, io) {
+function socketRoutes(app, io, pubClient) {
   io.on("connection", (socket) => {
     console.log("New client connected");
 
@@ -9,19 +9,50 @@ function socketRoutes(app, io) {
     });
 
     socket.on("createGame", (data) => {
-      let uuid = uuidv4().substring(0, 4);
-      let host = data.nickName;
-      console.log("createdGame", data.nickName);
+      if (!data.nickName) {
+        universalError("NickName null");
+        return;
+      }
 
-      socket.emit("gameCreated", uuid);
+      let gameCode = uuidv4().substring(0, 4);
+
+      pubClient.set(
+        gameCode,
+        JSON.stringify({
+          host: data.nickName,
+          users: [],
+        })
+      );
+
+      socket.emit("createdGame", { gameCode, nickName: data.nickName });
     });
-  });
 
-  const getApiAndEmit = (socket) => {
-    const response = new Date();
-    // Emitting a new message. Will be consumed by the client
-    socket.emit("FromAPI", response);
-  };
+    socket.on("joinGame", async (data) => {
+      if (!data.nickName || !data.gameCode) {
+        universalError("NickName or GameCode is null");
+        return;
+      }
+
+      const existentGame = await pubClient.get(data.gameCode);
+
+      if (existentGame) {
+        currentGame = JSON.parse(existentGame);
+        currentGame.users.push(data.nickName);
+        pubClient.set(data.gameCode, JSON.stringify(currentGame));
+
+        socket.emit("joinedGame", {
+          gameCode: data.gameCode,
+          nickName: data.nickName,
+        });
+      } else {
+        universalError("The Current Game Does Not Exist");
+      }
+    });
+
+    function universalError(message) {
+      socket.emit("universalError", { message });
+    }
+  });
 }
 
 module.exports = socketRoutes;
