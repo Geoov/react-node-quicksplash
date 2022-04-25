@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
-import { SocketContext } from "../../context/socket";
+import React, { useState, useEffect } from "react";
 import "./Lobby.scss";
 import UserCard from "../UserCard/UserCard";
 
@@ -7,14 +6,13 @@ function Lobby() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    setUsers(["Geov", "Test1", "Test2", "Test4"]);
   }, []);
 
   return (
     <div className="page-wrapper">
       <div className="users-wrapper">
-        {users.map((user) => {
-          <UserCard name={user} />;
+        {users.map((user, index) => {
+          return <UserCard key={index} name={user} />;
         })}
       </div>
     </div>

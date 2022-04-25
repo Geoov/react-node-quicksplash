@@ -15,9 +15,9 @@ function App() {
     <div className="App">
       <SocketContext.Provider value={socket}>
         {/* {!gameFound ? ( */}
-        {/* <FindGame onJoinedGame={handleFindGame}></FindGame> */}
+        <FindGame onJoinedGame={handleFindGame}></FindGame>
         {/* ) : ( */}
-        <Lobby></Lobby>
+        {/* <Lobby></Lobby> */}
         {/* )} */}
       </SocketContext.Provider>
     </div>

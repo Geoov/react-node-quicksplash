@@ -1,0 +1,12 @@
+.user-card-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: auto;
+}
+
+.user-card {
+  display: flex;
+  flex-direction: row;
+  min-width: 25%;
+  background-color: bisque;
+}
