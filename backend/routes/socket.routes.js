@@ -14,17 +14,20 @@ function socketRoutes(app, io, pubClient) {
         return;
       }
 
-      let gameCode = uuidv4().substring(0, 4);
+      let user = {
+        id: uuidv4().substring(0, 8),
+        nickName: data.nickName,
+        votes: 0,
+      };
 
       pubClient.set(
-        gameCode,
+        (gameCode = uuidv4().substring(0, 4)),
         JSON.stringify({
-          host: data.nickName,
-          users: [],
+          users: [user],
         })
       );
 
-      socket.emit("createdGame", { gameCode, nickName: data.nickName });
+      socket.emit("createdGame", { gameCode, user });
     });
 
     socket.on("joinGame", async (data) => {
@@ -35,18 +38,44 @@ function socketRoutes(app, io, pubClient) {
 
       const existentGame = await pubClient.get(data.gameCode);
 
-      if (existentGame) {
-        currentGame = JSON.parse(existentGame);
-        currentGame.users.push(data.nickName);
-        pubClient.set(data.gameCode, JSON.stringify(currentGame));
-
-        socket.emit("joinedGame", {
-          gameCode: data.gameCode,
-          nickName: data.nickName,
-        });
-      } else {
+      if (!existentGame) {
         universalError("The Current Game Does Not Exist");
+        return;
       }
+
+      let currentGame = JSON.parse(existentGame);
+      let user = {
+        id: uuidv4().substring(0, 8),
+        nickName: data.nickName,
+        votes: 0,
+      };
+
+      currentGame.users.push(user);
+      pubClient.set(data.gameCode, JSON.stringify(currentGame));
+
+      socket.emit("joinedGame", {
+        gameCode: data.gameCode,
+        user,
+      });
+    });
+
+    socket.on("getUsers", async (data) => {
+      if (!data.gameCode) {
+        universalError("GameCode doesn't exist");
+        return;
+      }
+
+      const existentGame = await pubClient.get(data.gameCode);
+
+      if (!existentGame) {
+        universalError("The Current Game Does Not Exist");
+        return;
+      }
+
+      currentGame = JSON.parse(existentGame);
+      io.emit("gameUsers", {
+        gameUsers: currentGame,
+      });
     });
 
     function universalError(message) {
