@@ -5,20 +5,20 @@ import FindGame from "./components/FindGame/FindGame";
 import Lobby from "./components/Lobby/Lobby";
 
 function App() {
-  const [gameFound, setGameFound] = useState(false);
+  const [gameFound, setGameFound] = useState("");
 
-  const handleFindGame = () => {
-    setGameFound(true);
+  const handleFindGame = (gameCode) => {
+    setGameFound(gameCode);
   };
 
   return (
     <div className="App">
       <SocketContext.Provider value={socket}>
-        {/* {!gameFound ? ( */}
-        <FindGame onJoinedGame={handleFindGame}></FindGame>
-        {/* ) : ( */}
-        {/* <Lobby></Lobby> */}
-        {/* )} */}
+        {!gameFound ? (
+          <FindGame onJoinedGame={handleFindGame}></FindGame>
+        ) : (
+          <Lobby currentGameCode={gameFound}></Lobby>
+        )}
       </SocketContext.Provider>
     </div>
   );

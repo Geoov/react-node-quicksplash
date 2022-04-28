@@ -4,7 +4,7 @@
   align-items: center;
   width: 100%;
   height: 100%;
-  background-color: bisque;
+  background-color: #12181b;
   padding: 20px;
 }
 
@@ -14,7 +14,7 @@
   height: 100%;
   align-items: center;
   justify-content: space-around;
-  background-color: azure;
+  background-color: #12181b;
   grid-gap: 20px;
   grid-template-columns: repeat(auto-fit, minmax(0, calc(100% / 4)));
   grid-auto-rows: auto;

@@ -7,6 +7,8 @@
 .user-card {
   display: flex;
   flex-direction: row;
-  min-width: 25%;
-  background-color: bisque;
+  justify-content: space-between;
+  max-width: 250px;
+  background-color: #2a2e35;
+  padding: 30px 10px;
 }

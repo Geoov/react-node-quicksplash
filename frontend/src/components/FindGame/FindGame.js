@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
 import { SocketContext } from "../../context/socket";
+import { useDispatch } from "react-redux";
+import { setUserId } from "../../features/userSlice";
 import "./FindGame.scss";
 import { Button } from "react-bootstrap";
 
 function FindGame({ onJoinedGame }) {
   const socket = useContext(SocketContext);
+  const dispatch = useDispatch();
+
   const [nickName, setNickName] = useState("");
   const [gameCode, setGameCode] = useState("");
 
@@ -21,14 +25,15 @@ function FindGame({ onJoinedGame }) {
   useEffect(() => {
     socket.on("createdGame", (data) => {
       console.log("createdGame", data);
-      onJoinedGame(true);
+      onJoinedGame(data.gameCode);
+      dispatch(setUserId(data.user.id));
     });
   }, []);
 
   useEffect(() => {
     socket.on("joinedGame", (data) => {
       console.log("joinedGame", data);
-      onJoinedGame(true);
+      onJoinedGame(data.gameCode);
     });
   }, []);
 
@@ -38,17 +43,17 @@ function FindGame({ onJoinedGame }) {
     });
   }, []);
 
-  async function joinGame() {
+  const joinGame = async () => {
     if (!nickName || !gameCode) return;
 
     socket.emit("joinGame", { nickName, gameCode });
-  }
+  };
 
-  async function createGame() {
+  const createGame = () => {
     if (!nickName) return;
 
     socket.emit("createGame", { nickName });
-  }
+  };
 
   return (
     <div className="page-wrapper">
