@@ -18,6 +18,7 @@ function socketRoutes(app, io, pubClient) {
         id: uuidv4().substring(0, 8),
         nickName: data.nickName,
         votes: 0,
+        ready: false,
       };
 
       pubClient.set(
@@ -48,6 +49,7 @@ function socketRoutes(app, io, pubClient) {
         id: uuidv4().substring(0, 8),
         nickName: data.nickName,
         votes: 0,
+        ready: false,
       };
 
       currentGame.users.push(user);
@@ -66,7 +68,6 @@ function socketRoutes(app, io, pubClient) {
       }
 
       const existentGame = await pubClient.get(data.gameCode);
-
       if (!existentGame) {
         universalError("The Current Game Does Not Exist");
         return;
@@ -76,6 +77,35 @@ function socketRoutes(app, io, pubClient) {
       io.emit("gameUsers", {
         gameUsers: currentGame,
       });
+    });
+
+    socket.on("userReady", async (data) => {
+      if (data.index !== null && !data.id) {
+        universalError("This user doesn't exists");
+        return;
+      }
+
+      const existentGame = await pubClient.get(data.gameCode);
+      if (!existentGame) {
+        universalError("The Current Game Does Not Exist");
+        return;
+      }
+
+      currentGame = JSON.parse(existentGame);
+      console.log(currentGame);
+    //   let currentGame = JSON.parse(existentGame);
+    //   let user = {
+    //     id: uuidv4().substring(0, 8),
+    //     nickName: data.nickName,
+    //     votes: 0,
+    //     ready: false,
+    //   };
+
+    //   currentGame.users.push(user);
+    //   pubClient.set(data.gameCode, JSON.stringify(currentGame));
+
+
+
     });
 
     function universalError(message) {

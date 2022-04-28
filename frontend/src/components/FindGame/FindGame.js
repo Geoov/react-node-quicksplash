@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
 import { SocketContext } from "../../context/socket";
 import { useDispatch } from "react-redux";
-import { setUserId } from "../../features/userSlice";
+import { setUserId, setUserVotes } from "../../features/userSlice";
+import { setGameId } from "../../features/gameSlice";
 import "./FindGame.scss";
 import { Button } from "react-bootstrap";
 
@@ -26,7 +27,9 @@ function FindGame({ onJoinedGame }) {
     socket.on("createdGame", (data) => {
       console.log("createdGame", data);
       onJoinedGame(data.gameCode);
-    //   dispatch(setUserId(data.user.id));
+      dispatch(setGameId(data.gameCode));
+      dispatch(setUserId(data.user.id));
+      dispatch(setUserVotes(data.user.votes));
     });
   }, []);
 
@@ -34,6 +37,8 @@ function FindGame({ onJoinedGame }) {
     socket.on("joinedGame", (data) => {
       console.log("joinedGame", data);
       onJoinedGame(data.gameCode);
+      dispatch(setUserId(data.user.id));
+      dispatch(setUserVotes(data.user.votes));
     });
   }, []);
 

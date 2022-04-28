@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { SocketContext } from "../../context/socket";
+import { useSelector } from "react-redux";
 import "./Lobby.scss";
 import UserCard from "../UserCard/UserCard";
 
@@ -7,22 +8,8 @@ const equals = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
 const Lobby = ({ currentGameCode }) => {
   const socket = useContext(SocketContext);
-
   const [users, setUsers] = useState([]);
-  const [isReadyObject, setIsReadyObject] = useState({
-    0: false,
-    1: false,
-    2: false,
-    3: false,
-    4: false,
-    5: false,
-    6: false,
-    7: false,
-    8: false,
-    9: false,
-    10: false,
-    11: false,
-  });
+  const reduxGameCode = useSelector((state) => state.game.gameId);
 
   useEffect(() => {
     if (!currentGameCode) return;
@@ -37,9 +24,14 @@ const Lobby = ({ currentGameCode }) => {
   });
 
   const updateIsReadyObject = (index) => {
-    const temp = { ...isReadyObject };
-    temp[index] = !temp[index];
-    setIsReadyObject(temp);
+    socket.emit("userReady", {
+      index,
+      id: users[index].id,
+      gameCode: reduxGameCode,
+    });
+    // const temp = { ...isReadyObject };
+    // temp[index] = !temp[index];
+    // setIsReadyObject(temp);
   };
 
   return (
@@ -52,7 +44,7 @@ const Lobby = ({ currentGameCode }) => {
               id={user.id}
               index={index}
               name={user.nickName}
-              isReady={isReadyObject[index]}
+              isReady={user.ready}
               updateIsReady={updateIsReadyObject}
             />
           );
