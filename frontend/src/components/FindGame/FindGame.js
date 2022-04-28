@@ -26,7 +26,7 @@ function FindGame({ onJoinedGame }) {
     socket.on("createdGame", (data) => {
       console.log("createdGame", data);
       onJoinedGame(data.gameCode);
-      dispatch(setUserId(data.user.id));
+    //   dispatch(setUserId(data.user.id));
     });
   }, []);
 
