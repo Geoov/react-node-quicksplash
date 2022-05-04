@@ -2,21 +2,29 @@ import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import "./UserCard.scss";
 
-const UserCard = ({ id, index, name, isReady, updateIsReady }) => {
+const UserCard = ({ id, index, name, isReady, updateIsReady, canStart, startGame }) => {
   const reduxUserId = useSelector((state) => state.user.userId);
 
-  useEffect(() => {
-    console.log(isReady);
-  }, [isReady]);
-
   const changeReadyState = () => {
-    updateIsReady(index);
+    updateIsReady(index, isReady);
   };
 
   return (
     <div className="user-card">
       <p className="name mb-0">{name}</p>
-      {id === reduxUserId ? (
+      {index === 0 ? (
+        <span> 
+          {id === reduxUserId ? (
+            canStart ? (
+              <button onClick={startGame}>Start</button>
+            ) : (
+              "Waiting"
+            )
+          ) : (
+            "Host"
+          )}
+        </span>
+      ) : id === reduxUserId ? (
         <span>
           <input
             type="checkbox"
@@ -25,7 +33,7 @@ const UserCard = ({ id, index, name, isReady, updateIsReady }) => {
           ></input>
         </span>
       ) : (
-        <span>{isReady ? 'ready' : 'stand-by'}</span>
+        <span>{isReady ? "ready" : "stand-by"}</span>
       )}
     </div>
   );

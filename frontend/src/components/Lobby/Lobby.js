@@ -8,14 +8,14 @@ const equals = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
 const Lobby = ({ currentGameCode }) => {
   const socket = useContext(SocketContext);
-  const [users, setUsers] = useState([]);
   const reduxGameCode = useSelector((state) => state.game.gameId);
+  const [users, setUsers] = useState([]);
+  const [canStart, setCanStart] = useState(false);
 
   useEffect(() => {
     if (!currentGameCode) return;
-
     socket.emit("getUsers", { gameCode: currentGameCode });
-  }, []);
+  }, [currentGameCode, socket]);
 
   socket.on("gameUsers", (data) => {
     if (!equals(users, data.gameUsers.users)) {
@@ -23,15 +23,32 @@ const Lobby = ({ currentGameCode }) => {
     }
   });
 
-  const updateIsReadyObject = (index) => {
-    socket.emit("userReady", {
+  const toggleReadyState = (index, isReady) => {
+    socket.emit("toggleReadyState", {
       index,
       id: users[index].id,
       gameCode: reduxGameCode,
+      readyState: !isReady,
     });
-    // const temp = { ...isReadyObject };
-    // temp[index] = !temp[index];
-    // setIsReadyObject(temp);
+  };
+
+  useEffect(() => {
+    let allPlayersReady = true;
+    users.forEach((user) => {
+      if (user.ready === false) {
+        allPlayersReady = false;
+        return;
+      }
+    });
+    allPlayersReady && users.length > 1
+      ? setCanStart(true)
+      : setCanStart(false);
+  }, [users]);
+
+  const startGame = () => {
+    socket.emit("startGame", {
+      gameCode: reduxGameCode,
+    });
   };
 
   return (
@@ -45,7 +62,9 @@ const Lobby = ({ currentGameCode }) => {
               index={index}
               name={user.nickName}
               isReady={user.ready}
-              updateIsReady={updateIsReadyObject}
+              updateIsReady={toggleReadyState}
+              canStart={canStart}
+              startGame={startGame}
             />
           );
         })}

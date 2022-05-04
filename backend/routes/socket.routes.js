@@ -18,7 +18,7 @@ function socketRoutes(app, io, pubClient) {
         id: uuidv4().substring(0, 8),
         nickName: data.nickName,
         votes: 0,
-        ready: false,
+        ready: true,
       };
 
       pubClient.set(
@@ -79,7 +79,7 @@ function socketRoutes(app, io, pubClient) {
       });
     });
 
-    socket.on("userReady", async (data) => {
+    socket.on("toggleReadyState", async (data) => {
       if (data.index !== null && !data.id) {
         universalError("This user doesn't exists");
         return;
@@ -92,20 +92,64 @@ function socketRoutes(app, io, pubClient) {
       }
 
       currentGame = JSON.parse(existentGame);
-      console.log(currentGame);
-    //   let currentGame = JSON.parse(existentGame);
-    //   let user = {
-    //     id: uuidv4().substring(0, 8),
-    //     nickName: data.nickName,
-    //     votes: 0,
-    //     ready: false,
-    //   };
+      currentGame.users[data.index].ready = data.readyState;
 
-    //   currentGame.users.push(user);
-    //   pubClient.set(data.gameCode, JSON.stringify(currentGame));
+      pubClient.set(data.gameCode, JSON.stringify(currentGame));
 
+      io.emit("gameUsers", {
+        gameUsers: currentGame,
+      });
+    });
 
+    socket.on("startGame", async (data) => {
+      const existentGame = await pubClient.get(data.gameCode);
+      if (!existentGame) {
+        universalError("The Current Game Does Not Exist");
+        return;
+      }
 
+      currentGame = JSON.parse(existentGame);
+
+      testGame = [
+        {
+          id: "110",
+          nickName: "Geov",
+          votes: 0,
+          ready: true,
+        },
+        {
+          id: "111",
+          nickName: "Test1",
+          votes: 0,
+          ready: true,
+        },
+        {
+          id: "112",
+          nickName: "Test2",
+          votes: 0,
+          ready: true,
+        },
+        {
+          id: "113",
+          nickName: "Test3",
+          votes: 0,
+          ready: true,
+        },
+        {
+          id: "114",
+          nickName: "Test4",
+          votes: 0,
+          ready: true,
+        },
+        {
+          id: "115",
+          nickName: "Test5",
+          votes: 0,
+          ready: true,
+        },
+      ];
+
+      console.log(currentGame, testGame);
     });
 
     function universalError(message) {
